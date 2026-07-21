@@ -13,4 +13,4 @@ fi
 
 npx sequelize db:migrate
 
-npm run dev -- --host
+npm run dev
