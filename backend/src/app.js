@@ -10,6 +10,7 @@ const conversionRoutes = require('./routes/conversionRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 const cookieParser = require('./middlewares/cookieParser');
 

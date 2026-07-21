@@ -5,11 +5,12 @@ const { UnauthorizedError } = require('../errors/AppError');
 
 const User = require('../models/User');
 
+const isProduction = process.env.NODE_ENV === 'production';
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
-  maxAge: 24 * 60 * 60 * 1000, // 1 day
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
+  maxAge: 24 * 60 * 60 * 1000,
   path: '/',
 };
 
@@ -68,7 +69,8 @@ exports.logoutUser = async (req, res, next) => {
 
     res.clearCookie('token', {
       httpOnly: true,
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
     });
 
