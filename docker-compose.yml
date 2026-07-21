@@ -7,22 +7,24 @@ services:
     container_name: backend-app
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
+    env_file:
+      - ./backend/.env
     environment:
       - PORT=8000
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_NAME=nexus
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - JWT_SECRET=super_secret_token
+      - CORS_ORIGIN=http://localhost:5173
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     volumes:
       - ./backend:/app
+      - /app/node_modules
     entrypoint: /app/entrypoint.sh
 
   frontend:
@@ -33,7 +35,9 @@ services:
     container_name: frontend-app
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
     volumes:
@@ -45,20 +49,27 @@ services:
     container_name: postgres-db
     restart: always
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
+    env_file:
+      - ./backend/.env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: nexus
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-nexus}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-nexus}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
     container_name: redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
 
 volumes:
   pgdata:
