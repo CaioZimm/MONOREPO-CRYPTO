@@ -21,3 +21,13 @@ exports.login = async (email) => {
         throw new Error(error.message);
     }
 }
+
+exports.updateProfile = async (userId, updatedFields) => {
+    try {
+        const user = await User.findByPk(userId);
+        if (!user) throw new Error("Usuário não encontrado");
+        return await user.update(updatedFields);
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}

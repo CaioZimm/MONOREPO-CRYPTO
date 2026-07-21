@@ -24,15 +24,15 @@ module.exports = {
         allowNull: false
       },
       amount: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(36, 18),
         allowNull: false
       },
       brl: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(36, 18),
         allowNull: false
       },
       usd: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(36, 18),
         allowNull: false
       },
       createdAt:{
@@ -44,6 +44,8 @@ module.exports = {
         allowNull: false
       }
     });
+
+    await queryInterface.addIndex('conversions', ['userId']);
   },
   
   async down (queryInterface, Sequelize) {

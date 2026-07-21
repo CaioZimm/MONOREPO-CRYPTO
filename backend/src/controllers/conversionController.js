@@ -1,27 +1,32 @@
-const conversionService = require('../services/conversionService')
+const conversionService = require('../services/conversionService');
 
-exports.registerConversion = async (req, res) => {
-    const { cryptoName, amount } = req.body
-    const userId = req.user.id
- 
-    try {
-        const conversion = await conversionService.registerConversion(userId, cryptoName, amount)
-        return res.status(201).json({ message: 'Consulta registrada', data: conversion })
+exports.registerConversion = async (req, res, next) => {
+  try {
+    const { cryptoName, amount } = req.body;
+    const userId = req.user.id;
 
-    } catch (error) {
-        return res.status(500).json({ error: error.message })
-    }
-}
+    const conversion = await conversionService.registerConversion(userId, cryptoName, amount);
 
-exports.historyConversion = async (req, res) => {
-    try {
-        const history = await conversionService.historyConversion(req.user.id);
-        return res.status(200).json({ message: 'Histórico de conversões: ', data: history })
+    return res.status(201).json({
+      success: true,
+      message: 'Conversão registrada',
+      data: conversion,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    } catch (error) {
-        if (error.message === 'Sem histórico até o momento') {
-            return res.status(404).json({ error: error.message });
-        }
-        return res.status(500).json({ error: 'Erro ao acessar histórico de conversões.' });
-    }
-}
+exports.historyConversion = async (req, res, next) => {
+  try {
+    const history = await conversionService.historyConversion(req.user.id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Histórico de conversões',
+      data: history,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,32 +1,37 @@
-const favoriteService = require('../services/favoriteService')
+const favoriteService = require('../services/favoriteService');
+const { ValidationError } = require('../errors/AppError');
 
-exports.toggleFavorite = async (req, res) => {
-    const { cryptoName } = req.body
+exports.toggleFavorite = async (req, res, next) => {
+  try {
+    const { cryptoName } = req.body;
     const userId = req.user.id;
 
     if (!cryptoName) {
-        return res.status(400).json({ error: 'Informe uma moeda para favoritar' });
+      throw new ValidationError('Informe uma moeda para favoritar');
     }
 
-    try {
-        const favorite = await favoriteService.toggleFavorites(userId, cryptoName);
-        res.status(favorite.favorited ? 201 : 200 ).json(
-            {   message: favorite.favorited ? 'Adicionado aos favoritos' : 'Removido dos favoritos', 
-                data: favorite 
-            });
+    const favorite = await favoriteService.toggleFavorites(userId, cryptoName);
 
-    } catch (error) {
-        return res.status(400).json({ error: error.message })
-    }
-}
+    return res.status(favorite.favorited ? 201 : 200).json({
+      success: true,
+      message: favorite.favorited ? 'Adicionado aos favoritos' : 'Removido dos favoritos',
+      data: favorite,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-exports.listFavorites = async (req, res) => {
-    try {
-        const favorites = await favoriteService.listFavorites(req.user.id);
-        
-        return res.status(200).json({ message: 'Lista de favoritos: ', data: favorites })
+exports.listFavorites = async (req, res, next) => {
+  try {
+    const favorites = await favoriteService.listFavorites(req.user.id);
 
-    } catch (error) {
-        return res.status(400).json({ error: error.message })
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: 'Lista de favoritos',
+      data: favorites,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

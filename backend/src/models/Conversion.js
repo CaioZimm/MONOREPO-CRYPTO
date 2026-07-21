@@ -11,15 +11,15 @@ const Conversion = database.define('Conversion', {
         allowNull: false
     },
     amount: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DECIMAL(36, 18),
         allowNull: false
     },
     brl: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DECIMAL(36, 18),
         allowNull: false
     },
     usd: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DECIMAL(36, 18),
         allowNull: false
     }
 }, {

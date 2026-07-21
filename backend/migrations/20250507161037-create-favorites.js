@@ -24,6 +24,13 @@ module.exports = {
         allowNull: false
       }
     });
+
+    await queryInterface.addIndex('favorites', ['userId']);
+    await queryInterface.addConstraint('favorites', {
+      fields: ['userId', 'cryptoName'],
+      type: 'unique',
+      name: 'unique_user_crypto_favorite'
+    });
   },
 
   async down (queryInterface, Sequelize) {

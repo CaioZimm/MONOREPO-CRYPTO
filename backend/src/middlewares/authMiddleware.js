@@ -1,26 +1,27 @@
-const redisClient = require('../../config/redis')
-const jwt = require('jsonwebtoken')
+const redisClient = require('../../config/redis');
+const jwt = require('jsonwebtoken');
+const { UnauthorizedError } = require('../errors/AppError');
 
 module.exports = async (req, res, next) => {
-    const token = req.header('Authorization')
+  const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
 
-    if(!token || !token.startsWith('Bearer ')){
-        return res.status(401).json({ message: 'Acesso negado, usuário não autenticado.'})
+  if (!token) {
+    return next(new UnauthorizedError('Acesso negado. Token/sessão não encontrada.'));
+  }
+
+  try {
+    // Check if token is blacklisted (user logged out)
+    const isBlacklisted = await redisClient.get(`blacklist:${token}`);
+    if (isBlacklisted) {
+      return next(new UnauthorizedError('Token ou sessão revogada/expirada.'));
     }
 
-    try {
-        const blackList = await redisClient.get(`blacklist:${token.replace('Bearer ', '')}`);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    req.token = token;
 
-        if (blackList){
-            return res.status(401).json({ message: "Token inválido ou expirado."})
-        }
-
-        const verify = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
-        req.user = verify;
-
-        next();
-
-    } catch (error) {
-        return res.status(400).json({ error: 'Token inválido' })
-    }
-}
+    next();
+  } catch (error) {
+    return next(new UnauthorizedError('Token ou sessão inválida'));
+  }
+};

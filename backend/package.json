@@ -1,9 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon ./config/index.js",
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -15,15 +16,20 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.6.0",
+    "helmet": "^8.3.0",
     "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
-    "nodemon": "^3.1.10",
     "pg": "^8.15.6",
     "pg-hstore": "^2.3.4",
-    "redis": "^5.0.1",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "socket.io": "^4.8.3",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "nodemon": "^3.1.10",
     "sequelize-cli": "^6.6.3"
   }
 }
