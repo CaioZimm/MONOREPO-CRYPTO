@@ -1,0 +1,68 @@
+export interface User {
+  id: number | string;
+  name: string;
+  email: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Crypto {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+  market_cap: number;
+  market_cap_rank: number;
+  fully_diluted_valuation?: number;
+  total_volume?: number;
+  high_24h?: number;
+  low_24h?: number;
+  price_change_24h?: number;
+  price_change_percentage_24h?: number;
+  market_cap_change_24h?: number;
+  market_cap_change_percentage_24h?: number;
+  circulating_supply?: number;
+  total_supply?: number;
+  max_supply?: number;
+  ath?: number;
+  ath_change_percentage?: number;
+  ath_date?: string;
+  atl?: number;
+  atl_change_percentage?: number;
+  atl_date?: string;
+  last_updated?: string;
+}
+
+export interface Conversion {
+  id: number;
+  userId?: number;
+  cryptoName: string;
+  amount: number;
+  brl: number;
+  usd: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Favorite {
+  id: number;
+  userId: number | string;
+  cryptoName: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ConversionResult {
+  brl: number;
+  usd: number;
+  cryptoName: string;
+  amount: number;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  error?: string;
+}
