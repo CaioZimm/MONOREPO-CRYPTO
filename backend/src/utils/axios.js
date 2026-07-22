@@ -19,16 +19,16 @@ async function getUsdBrlRate() {
 }
 
 const symbolMap = {
-  'bitcoin': 'BTCUSDT',
-  'ethereum': 'ETHUSDT',
-  'binancecoin': 'BNBUSDT',
-  'solana': 'SOLUSDT',
-  'ripple': 'XRPUSDT',
-  'cardano': 'ADAUSDT',
-  'dogecoin': 'DOGEUSDT',
-  'polkadot': 'DOTUSDT',
-  'litecoin': 'LTCUSDT',
-  'chainlink': 'LINKUSDT'
+  'bitcoin': 'BTC',
+  'ethereum': 'ETH',
+  'binancecoin': 'BNB',
+  'solana': 'SOL',
+  'ripple': 'XRP',
+  'cardano': 'ADA',
+  'dogecoin': 'DOGE',
+  'polkadot': 'DOT',
+  'litecoin': 'LTC',
+  'chainlink': 'LINK'
 };
 
 async function getFallbackPrice(cryptoName) {
@@ -51,24 +51,24 @@ async function getFallbackPrice(cryptoName) {
       brl: usdPrice * brlRate
     };
   } catch (err) {
-    console.warn(`CoinCap falhou para ${cryptoName}: ${err.message}. Tentando Binance...`);
-    
-    // Tenta Binance para moedas mapeadas
-    const binanceSymbol = symbolMap[cryptoName.toLowerCase()];
-    if (binanceSymbol) {
+    console.warn(`CoinCap falhou para ${cryptoName}: ${err.message}. Tentando Coinbase (EUA seguro)...`);
+
+    const ticker = symbolMap[cryptoName.toLowerCase()];
+    if (ticker) {
       try {
-        const binanceRes = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${binanceSymbol}`, { timeout: 5000 });
-        const usdPrice = parseFloat(binanceRes.data.price);
+        const coinbaseRes = await axios.get(`https://api.coinbase.com/v2/prices/${ticker}-USD/spot`, { timeout: 5000 });
+        const usdPrice = parseFloat(coinbaseRes.data.data.amount);
         const brlRate = await getUsdBrlRate();
+
         return {
           usd: usdPrice,
           brl: usdPrice * brlRate
         };
-      } catch (binanceErr) {
-        console.error(`Binance também falhou: ${binanceErr.message}`);
+      } catch (coinbaseErr) {
+        console.error(`Coinbase também falhou: ${coinbaseErr.message}`);
       }
     }
-    
+
     throw new AppError('Limite de requisições de todas as APIs atingido. Tente novamente em alguns minutos.', 429);
   }
 }
