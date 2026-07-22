@@ -18,9 +18,26 @@ async function getUsdBrlRate() {
   }
 }
 
+const symbolMap = {
+  'bitcoin': 'BTCUSDT',
+  'ethereum': 'ETHUSDT',
+  'binancecoin': 'BNBUSDT',
+  'solana': 'SOLUSDT',
+  'ripple': 'XRPUSDT',
+  'cardano': 'ADAUSDT',
+  'dogecoin': 'DOGEUSDT',
+  'polkadot': 'DOTUSDT',
+  'litecoin': 'LTCUSDT',
+  'chainlink': 'LINKUSDT'
+};
+
 async function getFallbackPrice(cryptoName) {
   try {
-    const response = await axios.get(`https://api.coincap.io/v2/assets/${cryptoName}`, { timeout: 5000 });
+    const config = {
+      timeout: 5000,
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+    };
+    const response = await axios.get(`https://api.coincap.io/v2/assets/${cryptoName}`, config);
 
     if (!response.data || !response.data.data) {
       throw new Error('Falha no payload do CoinCap');
@@ -34,6 +51,24 @@ async function getFallbackPrice(cryptoName) {
       brl: usdPrice * brlRate
     };
   } catch (err) {
+    console.warn(`CoinCap falhou para ${cryptoName}: ${err.message}. Tentando Binance...`);
+    
+    // Tenta Binance para moedas mapeadas
+    const binanceSymbol = symbolMap[cryptoName.toLowerCase()];
+    if (binanceSymbol) {
+      try {
+        const binanceRes = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${binanceSymbol}`, { timeout: 5000 });
+        const usdPrice = parseFloat(binanceRes.data.price);
+        const brlRate = await getUsdBrlRate();
+        return {
+          usd: usdPrice,
+          brl: usdPrice * brlRate
+        };
+      } catch (binanceErr) {
+        console.error(`Binance também falhou: ${binanceErr.message}`);
+      }
+    }
+    
     throw new AppError('Limite de requisições de todas as APIs atingido. Tente novamente em alguns minutos.', 429);
   }
 }
