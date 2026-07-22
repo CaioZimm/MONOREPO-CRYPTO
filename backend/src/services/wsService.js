@@ -93,8 +93,8 @@ const wsService = {
           })),
         };
 
-        // Cache no Redis por 40 segundos
-        await redis.set('ws:market_prices', JSON.stringify(payload), 'EX', 40);
+        // Cache no Redis por 120 segundos para poupar a API
+        await redis.set('ws:market_prices', JSON.stringify(payload), 'EX', 120);
 
         // Transmitir para todos os clientes conectados
         io.emit('market_update', payload);
@@ -113,10 +113,10 @@ const wsService = {
   startRealTimeFeed: () => {
     if (priceUpdateInterval) clearInterval(priceUpdateInterval);
 
-    // Rodar a cada 45 segundos para respeitar limites públicos da API e manter o feed em tempo real
+    // Rodar a cada 2 minutos (120000ms) para respeitar limites públicos da API e não tomar 429
     priceUpdateInterval = setInterval(async () => {
       await wsService.fetchAndBroadcastPrices();
-    }, 45000);
+    }, 120000);
   },
 
   getIO: () => io,

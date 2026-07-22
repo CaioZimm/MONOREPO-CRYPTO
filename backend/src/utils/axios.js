@@ -24,7 +24,7 @@ exports.getConversion = async (cryptoName) => {
       usd: response.data[cryptoName].usd,
     };
 
-    await redisClient.set(cacheKey, JSON.stringify(prices), 'EX', 60);
+    await redisClient.set(cacheKey, JSON.stringify(prices), 'EX', 600); // Cache de 10 min para poupar API
 
     return prices;
   } catch (error) {

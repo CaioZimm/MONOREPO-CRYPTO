@@ -1,7 +1,5 @@
 # 🚀 Crypto Platform
 
-![Nexus Banner](https://via.placeholder.com/1200x400.png?text=Nexus+Crypto+Platform)
-
 Crypto Platform é uma plataforma full-stack moderna para acompanhamento e conversão de criptomoedas em tempo real. Projetada com foco em performance, segurança e uma excelente experiência do usuário, a plataforma consome dados ao vivo da CoinGecko API.
 
 ---
